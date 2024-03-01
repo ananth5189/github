@@ -1,0 +1,67 @@
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def oddEvenList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        oddhead=None
+        oddtail=None
+        evenhead=None
+        eventail=None
+        temp=head
+        if temp is None:
+            return None
+        while temp is not None:
+            node=ListNode(temp.val)
+            if (self.lengthoflist(head)-self.lengthoflist(temp))%2==0:
+            #even index like 0,2,4,6,8 are considered as odd indexes and vice versa
+                oddhead,oddtail=self.insert(oddhead,oddtail,node)
+            else:
+                evenhead,eventail=self.insert(evenhead,eventail,node)
+            temp=temp.next
+        print(oddhead)
+        oddtail.next=evenhead
+        return oddhead
+    def insert(self,head,tail,node):
+        if head is None:
+            head=node
+            tail=node
+        else:
+            tail.next=node
+            tail=node
+        return head,tail
+    def lengthoflist(self,head):
+        if head is None:
+            return 0
+        temp=head
+        count=0
+        while temp is not None:
+            count+=1
+            temp=temp.next
+        return count
+
+#Alternative solution
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def oddEvenList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None:
+            return head
+        temp=head
+        temp2=head.next
+        temp3=head.next
+        while temp2 is not None and temp2.next is not None:
+            temp.next=temp2.next
+            temp=temp.next
+            temp2.next=temp.next
+            temp2=temp2.next
+        temp.next=temp3
+        return head
+
+
+
+        
