@@ -1,0 +1,23 @@
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def getDecimalValue(self, head: ListNode) -> int:
+        arr=self.listtoarray(head)
+        sum=0
+        bin=1
+        for i in arr:
+            sum+=(bin*i)
+            bin*=2
+        return sum
+    def listtoarray(self,head):
+        if head is None:
+            return []
+        temp=head
+        arr=[]
+        while temp is not None:
+            arr.append(temp.val)
+            temp=temp.next
+        return arr[::-1]
