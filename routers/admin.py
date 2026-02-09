@@ -8,7 +8,7 @@ from pydantics.taskrequest import TaskRequest
 from .auth import get_current_user
 
 
-router=APIRouter(tags=['Admin -Only accessible to admin users'])
+router=APIRouter(prefix="/admin",tags=['Admin -Only accessible to admin users'])
 
 def get_db():
     db=SessionLocal()#open connection
@@ -29,11 +29,11 @@ async def get_all_tasks(user:user_dependency,db:db_dependency):
     return tasks
 
 @router.delete('/deletetask/{taskid}',status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(user:user_dependency,db:db_dependency,taskid:int=Path(gt=0)):
+def delete_task(user:user_dependency,db:db_dependency,taskid:int=Path(gt=0)):
     if user is None or user.get('user_role')!='admin':
         raise HTTPException(status_code=401,detail='Authentication failed')  
     task=db.query(Tasks).filter(Tasks.id==taskid).first()
     if task is None:
-        raise HTTPException(status_code=403,detail='task  is not found')
+        raise HTTPException(status_code=404,detail='task  is not found')
     db.query(Tasks).filter(Tasks.id==taskid).delete()
     db.commit()

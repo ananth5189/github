@@ -10,15 +10,15 @@ from .auth import get_current_user
 from passlib.context import CryptContext
 
 
-router=APIRouter(tags=['User Service'])
+router=APIRouter(prefix="/users",tags=['User Service'])
 
 def get_db():
-    db=SessionLocal()#open connection
+    db=SessionLocal()
     try:
         yield db
     finally:
         db.close()
-bcrypt_context=CryptContext(schemes=['bcrypt'],deprecated='auto')#setup info
+bcrypt_context=CryptContext(schemes=['bcrypt'],deprecated='auto')
 
 
 

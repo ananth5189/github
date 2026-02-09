@@ -8,11 +8,11 @@ from pydantics.taskrequest import TaskRequest
 from .auth import get_current_user
 
 
-router=APIRouter(tags=['Tasks Service'])
+router=APIRouter(prefix="/tasks",tags=['Tasks Service'])
 
 
 def get_db():
-    db=SessionLocal()#open connection
+    db=SessionLocal()
     try:
         yield db
     finally:

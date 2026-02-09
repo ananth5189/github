@@ -1,212 +1,262 @@
-# Todo App - API Gateway
+# Todo App - FastAPI Backend
 
-A FastAPI-based API Gateway that routes requests to multiple microservices (Auth, Users, Tasks, Admin). This project demonstrates microservices architecture, centralized routing, and containerization with Docker.
+A modern FastAPI-based Todo application featuring user authentication, task management, and role-based access control. Built with SQLAlchemy ORM, JWT authentication, and database migrations using Alembic.
 
 ## 🎯 Project Overview
 
-This API Gateway acts as a single entry point for all client requests and routes them to appropriate backend services. It includes:
+A full-featured Todo/Task management API with the following capabilities:
 
-- **Authentication Service** (`/api/v1/auth`) - User login, registration, tokens
-- **User Service** (`/api/v1/users`) - User profile management
-- **Tasks Service** (`/api/v1/tasks`) - Todo/task management
-- **Admin Service** (`/api/v1/admin`) - Administrative operations
+- **Authentication** - User registration, login, JWT token management
+- **User Management** - User profiles, profile updates, address management
+- **Task Management** - Create, read, update, delete tasks with priority levels
+- **Admin Operations** - Administrative controls and user management
+- **Role-Based Access** - Different permission levels for users and admins
 
-## 🏗️ Architecture
+## 🏗️ Project Structure
 
 ```
-Client Requests
-    ↓
-API Gateway (gateway.py)
-    ├─ /api/v1/auth → Authentication Service
-    ├─ /api/v1/users → User Service
-    ├─ /api/v1/tasks → Tasks Service
-    └─ /api/v1/admin → Admin Service
-    ↓
-Database (SQLite)
+todo App/
+├── main.py              # FastAPI app entry point with router imports
+├── models.py            # SQLAlchemy database models (Users, Tasks)
+├── database.py          # Database configuration and session management
+├── requirements.txt     # Project dependencies
+├── secrets.env          # Environment variables (not tracked in git)
+├── alembic.ini          # Alembic migration configuration
+│
+├── routers/             # API endpoint handlers
+│   ├── auth.py          # Authentication endpoints
+│   ├── user.py          # User management endpoints
+│   ├── tasks.py         # Task management endpoints
+│   └── admin.py         # Admin operations endpoints
+│
+├── pydantics/           # Pydantic request/response models
+│   ├── user.py          # User schemas
+│   ├── taskrequest.py   # Task schemas
+│   ├── userupdates.py   # User update schemas
+│   └── tokens.py        # Token schemas
+│
+└── alembic/             # Database migration files
+    ├── env.py
+    ├── script.py.mako
+    └── versions/        # Migration scripts
 ```
 
-## 📚 Key Concepts Covered
+## 📊 Database Schema
 
-### 1. **Microservices Architecture**
-- Decoupled services that handle specific domains
-- Each service has its own router
-- Independent deployment capability
+### Users Table
+- `id` - Primary key
+- `username` - Unique username
+- `email` - Unique email address
+- `firstname`, `lastname` - User names
+- `hashed_password` - Encrypted password
+- `is_active` - Account status
+- `role` - User role (user/admin)
+- `address` - User address
 
-### 2. **API Gateway Pattern**
-- Single entry point for all requests
-- Centralized routing with `/api/v1` prefix
-- Simplifies client integration
+### Tasks Table
+- `id` - Primary key
+- `title` - Task title
+- `description` - Task description
+- `priority` - Priority level (1-5)
+- `complete` - Completion status
+- `owner_id` - Foreign key to Users table
 
-### 3. **Request Routing**
-- Routes incoming requests to appropriate services
-- Maintains consistent API structure
-- Easy to add/remove services
+## 🎓 Key Technologies & Concepts
 
-### 4. **FastAPI Framework**
-- Async Python web framework
-- Auto-generated API documentation (Swagger UI)
-- Type hints and validation
+### FastAPI Framework
+- Async Python web framework with automatic API documentation
+- Type hints with Pydantic for request/response validation
+- Built-in OpenAPI/Swagger UI support
 
-### 5. **Database Integration**
-- SQLAlchemy ORM
-- SQLite database
-- Alembic migrations
+### Database Layer
+- **SQLAlchemy ORM** - Object-relational mapping for database operations
+- **SQLite** - Lightweight database (tasksapp.db)
+- **Alembic** - Database schema versioning and migrations
 
-### 6. **Authentication & Authorization**
-- JWT token-based auth
-- bcrypt password hashing
-- OAuth2 implementation
+### Authentication & Security
+- **JWT Tokens** - JSON Web Tokens for stateless authentication
+- **OAuth2 + Bearer Tokens** - Standard authentication scheme
+- **Passlib + Bcrypt** - Secure password hashing and verification
 
-### 7. **Containerization (Docker)**
-- Dockerfile for image creation
-- docker-compose for orchestration
-- Consistent deployment across environments
+### Routing & API Structure
+- Modular routers for different services (auth, users, tasks, admin)
+- RESTful endpoints organized by functionality
+- Centralized database session management
 
-## 🚀 Quick Start
+### Development Tools
+- **black** - Code formatting
+- **pylint**, **flake8** - Code linting
+- **pytest** - Unit testing framework
+- **python-dotenv** - Environment variable management
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.11+
-- Docker & Docker Compose (optional)
+- Python 3.9+
+- pip (Python package manager)
 - Git
 
 ### Installation
 
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd "todo App"
+   ```
+
+2. **Create a virtual environment (optional but recommended)**
+   ```bash
+   python -m venv venv
+   # Windows
+   venv\Scripts\activate
+   # macOS/Linux
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables**
+   ```bash
+   # Create .env file with required variables
+   # Copy secrets.env as reference
+   ```
+
+5. **Initialize the database**
+   ```bash
+   # Create tables
+   python -c "from database import Base, engine; Base.metadata.create_all(bind=engine)"
+   ```
+
+### Running the Application
+
+**Start the FastAPI server**
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd "todo App"
-
-# Install dependencies
-pip install -r requirements.txt
+python -m uvicorn main:app --reload
 ```
 
-### 🚀 Quick Start (5 Steps)
+The server will start at `http://localhost:8000`
 
-1. **Verify Gateway is Running**
+### Accessing the API
+
+- **Swagger UI Documentation**: `http://localhost:8000/docs`
+- **Alternative API Docs (ReDoc)**: `http://localhost:8000/redoc`
+- **OpenAPI Schema**: `http://localhost:8000/openapi.json`
+
+## 📝 API Endpoints
+
+### Authentication Routes (`/auth`)
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login user (returns JWT token)
+- `POST /auth/refresh` - Refresh expired token
+
+### User Routes (`/users`)
+- `GET /users/{user_id}` - Get user profile
+- `PUT /users/{user_id}` - Update user profile
+- `GET /users` - List all users (admin only)
+- `DELETE /users/{user_id}` - Delete user (admin only)
+
+### Task Routes (`/tasks`)
+- `GET /tasks` - Get all tasks for current user
+- `POST /tasks` - Create a new task
+- `GET /tasks/{task_id}` - Get specific task
+- `PUT /tasks/{task_id}` - Update task
+- `DELETE /tasks/{task_id}` - Delete task
+
+### Admin Routes (`/admin`)
+- `GET /admin/users` - List all users
+- `GET /admin/stats` - Get application statistics
+- `POST /admin/promote` - Promote user to admin
+- `DELETE /admin/users/{user_id}` - Remove user
+
+## 🗄️ Database Migrations with Alembic
+
+### Creating a new migration
 ```bash
-# Start the gateway
-python gateway.py
-# OR: uvicorn gateway:app --reload
+alembic revision --autogenerate -m "description of changes"
 ```
 
-2. **Check Health**
+### Applying migrations
 ```bash
-curl http://localhost:8000/health
+alembic upgrade head
 ```
 
-3. **Access API Documentation**
-   - Interactive: `http://localhost:8000/docs`
-   - Alternative: `http://localhost:8000/redoc`
-
-4. **Test Auth Endpoint**
+### Viewing migration history
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=testuser&password=testpassword"
+alembic history
 ```
 
-5. **Use Custom Port** (if 8000 is busy)
+### Reverting migrations
 ```bash
-uvicorn gateway:app --port 8001
+alembic downgrade -1
 ```
 
-### Run with Docker
+## 🔐 Environment Variables
 
-**Option 1: Using docker-compose**
+Create a `.env` file or use `secrets.env`:
+```
+DATABASE_URL=sqlite:///tasksapp.db
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+## 📦 Project Dependencies
+
+**Core Framework**
+- fastapi==0.104.1
+- uvicorn[standard]==0.24.0
+
+**Database**
+- sqlalchemy==2.0.23
+- alembic==1.13.1
+
+**Authentication**
+- python-jose[cryptography]==3.3.0
+- passlib[bcrypt]==1.7.4
+
+**Additional**
+- pydantic==2.5.0
+- python-dotenv==1.0.0
+
+**Development & Testing**
+- pytest==7.4.3
+- black==23.12.0
+- pylint==3.0.3
+- flake8==6.1.0
+
+## 🧪 Testing
+
+Run tests with pytest:
 ```bash
-# Start
-docker-compose up
-
-# Stop
-docker-compose down
-
-# View logs
-docker-compose logs -f
+pytest
+# With coverage
+pytest --cov=.
 ```
 
-**Option 2: Using Docker directly**
+## 🛠️ Development
+
+### Code Formatting
 ```bash
-# Build image
-docker build -t my-gateway .
-
-# Run container
-docker run -p 8000:8000 my-gateway
+black .
 ```
 
-## 📋 API Endpoints
-
-### Authentication Service (`/api/v1/auth`)
-```
-POST   /api/v1/auth/token        - User login
-POST   /api/v1/auth/signup       - Register new user
-POST   /api/v1/auth/email        - Email verification
-POST   /api/v1/auth/refresh-token - Refresh token
+### Linting
+```bash
+pylint routers/ models.py main.py
+flake8 .
 ```
 
-### User Service (`/api/v1/users`)
-```
-GET    /api/v1/users             - Get all users
-GET    /api/v1/users/{user_id}   - Get specific user
-PUT    /api/v1/users/{user_id}   - Update user
-DELETE /api/v1/users/{user_id}   - Delete user
-```
+## 📄 License
 
-### Tasks Service (`/api/v1/tasks`)
-```
-GET    /api/v1/tasks             - Get all tasks
-GET    /api/v1/tasks/{task_id}   - Get specific task
-POST   /api/v1/tasks             - Create task
-PUT    /api/v1/tasks/{task_id}   - Update task
-DELETE /api/v1/tasks/{task_id}   - Delete task
-```
+[Add your license here]
 
-### Admin Service (`/api/v1/admin`)
-```
-GET    /api/v1/admin             - Admin dashboard
-POST   /api/v1/admin             - Admin operations
-```
+## 👥 Contributors
 
-## 📁 Project Structure
+[Add contributors here]
 
-```
-todo App/
-├── gateway.py              # API Gateway entry point
-├── main.py                 # Original FastAPI app
-├── models.py               # Database models (Users, Tasks)
-├── database.py             # Database configuration
-├── requirements.txt        # Python dependencies
-├── Dockerfile              # Container image definition
-├── docker-compose.yml      # Docker orchestration
-├── .env.example            # Environment variables template
-├── secrets.env             # Secret configurations
-├── QUICKSTART.md           # Quick start guide
-├── README.md               # This file
-├── alembic.ini             # Database migration config
-├── routers/                # Microservices
-│   ├── auth.py             # Authentication service
-│   ├── user.py             # User service
-│   ├── tasks.py            # Tasks service
-│   └── admin.py            # Admin service
-├── pydantics/              # Request/Response schemas
-│   ├── user.py
-│   ├── tokens.py
-│   ├── taskrequest.py
-│   └── userupdates.py
-└── alembic/                # Database migrations
-```
-
-## 🔑 Technology Stack
-
-| Technology | Purpose |
-|-----------|---------|
-| **FastAPI** | Web framework |
-| **Uvicorn** | ASGI server |
-| **SQLAlchemy** | ORM |
-| **SQLite** | Database |
-| **Pydantic** | Data validation |
-| **Python-Jose** | JWT tokens |
-| **Passlib + Bcrypt** | Password hashing |
-| **Alembic** | Database migrations |
 | **Docker** | Containerization |
 
 ## 💡 Usage Examples

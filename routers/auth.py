@@ -10,17 +10,18 @@ from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from jose import jwt,JWTError
 from pydantics.tokens import Token
-import secrets
 from dotenv import load_dotenv
 
 
-router=APIRouter(tags=['Authentication Service'])
+router=APIRouter(prefix="/auth",tags=['Authentication Service'])
 
 
 
 bcrypt_context=CryptContext(schemes=['bcrypt'],deprecated='auto')
 oauth2_bearer=OAuth2PasswordBearer(tokenUrl='auth/token')
-load_dotenv('secrets.env')
+BASE_DIR=os.path.dirname(os.path.abspath(__file__))
+secrets_path=os.path.join(BASE_DIR,'..','secrets.env')
+load_dotenv(secrets_path)
 
 def get_db():
     db=SessionLocal()
@@ -65,9 +66,7 @@ user_dependency=Annotated[dict,Depends(get_current_user)]
 
 
 @router.post('/signup',status_code=status.HTTP_201_CREATED)
-async def createuser(user:user_dependency,newuserrequest:CreateUserRequest,db:db_dependency):
-    if user is not None:
-        raise HTTPException(status_code=403,detail='user already logged in')
+async def createuser(newuserrequest:CreateUserRequest,db:db_dependency):
     newusermodel=Users(
         username=newuserrequest.username,
         email=newuserrequest.email,
@@ -87,7 +86,6 @@ async def login_for_access_token(db:db_dependency,form_data:Annotated[OAuth2Pass
     if not authuser:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Unauthorised user')
     jwttoken=create_access_token(authuser.username,authuser.id,authuser.role,timedelta(minutes=20))
+    print(jwttoken)
     return {'access_token':jwttoken,'token_type':'bearer'}
-
-
 
