@@ -248,11 +248,6 @@ pylint routers/ models.py main.py
 flake8 .
 ```
 
-## 📄 License
-
-This project is licensed under the MIT license
-
-
 ## 💡 Usage Examples
 
 ### 1. Register a User
