@@ -1,4 +1,4 @@
-# Todo App - FastAPI Backend
+# Task manager App - FastAPI Backend
 
 A modern FastAPI-based Todo application featuring user authentication, task management, and role-based access control. Built with SQLAlchemy ORM, JWT authentication, and database migrations using Alembic.
 
@@ -83,8 +83,7 @@ todo App/
 - RESTful endpoints organized by functionality
 - Centralized database session management
 
-### Development Tools
-- **black** - Code formatting
+### Future Development Tools
 - **pylint**, **flake8** - Code linting
 - **pytest** - Unit testing framework
 - **python-dotenv** - Environment variable management
@@ -101,7 +100,7 @@ todo App/
 1. **Clone the repository**
    ```bash
    git clone <your-repo-url>
-   cd "todo App"
+   cd "folder_name"
    ```
 
 2. **Create a virtual environment (optional but recommended)**
@@ -236,7 +235,7 @@ pytest
 pytest --cov=.
 ```
 
-## 🛠️ Development
+## 🛠️Future Development
 
 ### Code Formatting
 ```bash
@@ -253,11 +252,6 @@ flake8 .
 
 [Add your license here]
 
-## 👥 Contributors
-
-[Add contributors here]
-
-| **Docker** | Containerization |
 
 ## 💡 Usage Examples
 
@@ -414,4 +408,4 @@ For questions or issues, please open a GitHub issue.
 
 ---
 
-**Ready to use!** Start with `python gateway.py` or `docker-compose up`
+**Ready to use!** Start with `uvicorn main:app --reload` 
