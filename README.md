@@ -250,7 +250,7 @@ flake8 .
 
 ## 📄 License
 
-[Add your license here]
+This project is licensed under the MIT license
 
 
 ## 💡 Usage Examples
